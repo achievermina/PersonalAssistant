@@ -1,4 +1,4 @@
-from DataBase.Database_Dynamo import database
+from DataBase.dynamoDB import Database
 from API.User import User
 import logging, json, requests, os
 import configparser
@@ -113,7 +113,7 @@ def callback():
 
 @app.route('/test-items')
 def test_items():
-    db = database()
+    db = Database()
     return '''<h2>db.test_db()</h2>'''
 
 

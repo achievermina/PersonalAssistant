@@ -1,5 +1,5 @@
 from flask_login import UserMixin
-from DataBase.Database_Dynamo import database
+from DataBase.dynamoDB import Database
 import logging
 
 class User(UserMixin):
@@ -11,7 +11,7 @@ class User(UserMixin):
     @staticmethod
     def get(user_id):
         try:
-            db = database()
+            db = Database()
             user =  db.read_item("user-info", "id", user_id)
             user = User(
                 id_=user["Item"]["id"], email=user["Item"]["email"]
@@ -24,7 +24,7 @@ class User(UserMixin):
     @staticmethod
     def create(id, name, email):
         try:
-            db = database()
+            db = Database()
             item = {"id": id, "email": email}
             db.add_item("user-info", item)
         except:

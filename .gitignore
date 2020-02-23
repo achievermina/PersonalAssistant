@@ -1,3 +1,6 @@
 *.ini
 /Credentials/*
 .idea
+__pycache__/
+.cache
+.pytest_cache
