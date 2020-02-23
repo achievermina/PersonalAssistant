@@ -104,6 +104,7 @@ def callback():
         User.create(unique_id, users_name, users_email)
         logging.info(' adding user done')
 
+    ### After saving the user information, not able to keep the login
     login_user(user)
 
     return redirect(url_for("index"))

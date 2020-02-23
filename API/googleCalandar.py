@@ -4,7 +4,8 @@ import pickle
 from DataBase.dynamoDB import Database
 import bcrypt
 
-
+### How to save credentials
+### How to connect with google signin
 
 class GoogleCanlandarAPI:
     def __init__(self):
