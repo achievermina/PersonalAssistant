@@ -1,17 +1,28 @@
 version: '3'
 
+volumes:
+  dynamodb_data:
+
 services:
   dynamodb:
     image: amazon/dynamodb-local
     hostname: dynamodb-local
     container_name: dynamodb-local
+    volumes:
+      - dynamodb_data:/home/dynamodblocal/data
     ports:
       - "8042:8000"
 
 
 # create database
 
-# docker-compose -f docker-compose.yaml up -d
+docker-compose -f docker-compose.yaml up
+
+# -d: demon --> background 에서 돌리는것
+###  로그가 안보임
+###  죽으나 사나 모름
+
+
 
 
 

@@ -4,6 +4,9 @@ import pickle
 from DataBase.dynamoDB import Database
 import bcrypt
 
+#!flask/bin/python
+
+
 ### How to save credentials
 ### How to connect with google signin
 
@@ -16,7 +19,8 @@ class GoogleCanlandarAPI:
         scopes = ['https://www.googleapis.com/auth/calendar']
         flow = InstalledAppFlow.from_client_secrets_file('./Credentials/client_calendar_other2.json', scopes=scopes)
         credentials = flow.run_console()
-        self. store_password("hi", credentials)
+        print(credentials)
+        # self. store_password("hi", credentials)
 
     def store_password(self, email, credentials):
         hashedCredentials = bcrypt.hashpw(credentials, bcrypt.gensalt())

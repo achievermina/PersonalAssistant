@@ -2,8 +2,9 @@ import boto3
 
 
 class Database:
-    def __init__(self):
+    def __init__(self, table):
         self.dynamo_client = boto3.resource('dynamodb', endpoint_url='http://localhost:8042/')
+        # self.db = self.dynamo_client.Table(table)
         # self.response = self.dynamo_client.list_tables()
 
     def add_item(self, table_name, col_dict):
@@ -13,11 +14,15 @@ class Database:
 
     def read_item(self, table_name, pk_name, pk_value):
         table = self.dynamo_client.Table(table_name)
-        response = table.get_item(TableName=table_name, Key={'id': pk_value})
-        return response
+        response = table.get_item( Key={'id': pk_value})
+        return response['Item']
 
-    def update_item(self, table_name, pk_name, pk_value):
-        pass
+    def update_item(self, table_name, pk_value, ):
+        table = self.dynamo_client.Table(table_name)
+        table.update_item(Key={'id': pk_value},
+                          UpdateExpression='SET age = :val1',
+                            ExpressionAttributeValues={ ':val1': 26 })
+
 
     def read_all_item(self, table_name):
         table = self.dynamo_client.Table(table_name)
@@ -39,6 +44,8 @@ if __name__ == '__main__':
     print(res3)
 
 
-## docker-compose -f docker-compose-dynamodb-local.yaml up -d
+## docker-compose -f docker-compose.yaml up -d
+
+
 ## docker run -d -p 8000:8000 amazon/dynamodb-local
 ## docker run -p 8000:8000 -v my-volume:/dbstore amazon/dynamodb-local -jar DynamoDBLocal.jar -sharedDb -dbPath /dbstore
