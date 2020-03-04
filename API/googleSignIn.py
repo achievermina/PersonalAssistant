@@ -1,82 +1,54 @@
-import getpass
 from DataBase.dynamoDB import Database
-import json, requests
+import logging
 from API.User import User
-from flask import jsonify, request
 import configparser
-from oauthlib.oauth2 import WebApplicationClient
-
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 config = configparser.ConfigParser()
-config.read('config.ini')
+config.read('./config.ini')
 config.sections()
-
 
 
 GOOGLE_CLIENT_ID = config['google']['client_id']
 GOOGLE_CLIENT_SECRET = config['google']['client_secret']
-GOOGLE_DISCOVERY_URL = (
-    "https://accounts.google.com/.well-known/openid-configuration"
-)
 
-client = WebApplicationClient(GOOGLE_CLIENT_ID)
+idinfo = {'sub':"555", 'email':'hi@gmail.com', "name":"mina", "expires_at":123}
 
-def get_google_provider_cfg():
-    return requests.get(GOOGLE_DISCOVERY_URL).json()
+def google_token_verification(accessToken):
+    try:
+        print("accesstoken in gs", accessToken)
+        # idinfo = id_token.verify_oauth2_token(accessToken, requests.Request(), GOOGLE_CLIENT_ID)
+        #
+        # if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+        #     raise ValueError('Wrong issuer.')
+        # user_id = idinfo['sub']
 
+    except ValueError:
+        return
 
-def check_authentication(currentUser):
-    # retrieve user information
-    # requestUser = json.loads(user)
-    id = currentUser['id']
-    name = currentUser['name']
-    email = currentUser['email']
-    accessToken = currentUser['accessToken']
-    idToken = currentUser['idToken']
-    expires_at = currentUser['expires_at']
-    result = ""
-
-    # check DB
-    dbUser = User.get(email, id)
-
-    # if user exists -> login
-    # if user not exist or no token, google authentication again
-    # then create/update user
-    if dbUser is None:
-        if (check_email_verification(currentUser) and User.create(currentUser)):
-            return User.get(email, id)
+    user = User.get(user_id)
+    print("user get:", user)
+    if user is None:
+        newUser = {
+            "id":  idinfo["sub"],
+            "email": idinfo["email"],
+            "name": idinfo["name"],
+            "expires_at": idinfo["expires_at"],
+            "authenticated": idinfo["email_verified"]
+        }
+        if add_user_to_database(newUser):
+            user = User.get(user_id)
         else:
-            return None
-    else:
-        return dbUser
+            return
+    return user
 
-
-## Maybe error here
-def check_email_verification(currentUser):
-    code = request.args.get("code")
-    google_provider_cfg = get_google_provider_cfg()
-    token_endpoint = google_provider_cfg["token_endpoint"]
-    token_url, headers, body = client.prepare_token_request(
-        token_endpoint,
-        authorization_response= request.url,
-        redirect_url= request.base_url,
-        code=code,
-    )
-    token_response = requests.post(
-        token_url,
-        headers=headers,
-        data=body,
-        auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
-    )
-
-    #Parse the token
-    client.parse_request_body_response(json.dumps(token_response.json()))
-    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
-    uri, headers, body = client.add_token(userinfo_endpoint)
-    userinfo_response = requests.get(uri, headers=headers, data=body)
-    print(userinfo_response.json())
-    if userinfo_response.json().get("email_verified"):
+def add_user_to_database(user):
+    try:
+        db = Database()
+        db.add_item("user-info2", user)
         return True
-    else:
-        return False
+    except:
+        logging.info("Adding email: ", user['email'], " failed" )
 
+    return False

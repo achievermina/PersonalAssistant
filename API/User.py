@@ -4,37 +4,29 @@ import logging
 import json
 
 class User(UserMixin):
-    def __init__(self, user):
-        # currentUser = json.loads(user)
-        # self.id = currentUser['id']
-        # self.name = currentUser['name']
-        # self.email = currentUser['email']
-        # self.accessToken = currentUser['accessToken']
-        # self.idToken = currentUser['idToken']
-        # self.expires_at = currentUser['expires_at']
-        pass
+    def __init__(self, user_id, email=None, name=None, authenticated=False):
+        self.id = user_id
+        self.email = email
+        self.name = name
+        self.authenticated = authenticated
+        self.active = True
 
     @staticmethod
-    def get(user_id, user_email):
+    def get(user_id):
         try:
             db = Database()
-            user =  sdb.read_item("user-info", "id", user_id)
-            user = User(
-                id_=user["Item"]["id"], email=user["Item"]["email"]
-            )
-
-            if (user.email == user_email):
-                return user
+            user =  db.read_item("user-info2", user_id)
+            current_user = User(user['id'], user['email'], user['name'], user['authenticated'])
+            return current_user
 
         except:
             return None
 
-    @staticmethod
-    def create(id, name, email):
-        try:
-            db = Database()
-            item = {"id": id, "email": email}
-            db.add_item("user-info", item)
-            return True
-        except:
-            logging.info("Adding email: ", email, " failed" )
+    def is_active(self):
+        return True
+
+    def is_authenticated(self):
+        return self.authenticated
+
+    def __repr__(self):
+        return " "

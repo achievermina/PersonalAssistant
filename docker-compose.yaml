@@ -16,7 +16,7 @@ services:
 
 # create database
 
-docker-compose -f docker-compose.yaml up
+#docker-compose -f docker-compose.yaml up
 
 # -d: demon --> background 에서 돌리는것
 ###  로그가 안보임
@@ -24,6 +24,8 @@ docker-compose -f docker-compose.yaml up
 
 
 
+
+## Shell Script
 
 
 #  create Table
