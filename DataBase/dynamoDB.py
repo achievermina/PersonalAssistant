@@ -73,7 +73,7 @@ if __name__ == '__main__':
     # db.add_item("user-info", item2)
     item = {"id": "8888", "email": "hi@gmail.com", "name": "mina", "authenticated":False}
     db.add_item("user-info2", item)
-    res2 = db.read_item2("user-info2", "8888")
+    res2 = db.read_item("user-info2", "8888")
     print(res2)
     res3 = db.read_all_item("user-info2")
     print(res3)

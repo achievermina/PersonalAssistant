@@ -7,7 +7,7 @@ from flask_cors import CORS
 import logging
 from flask import Flask, redirect, url_for, session, render_template, request
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
-
+import jwt
 
 SECRET_KEY = 'development key'
 app = Flask(__name__)
@@ -25,15 +25,23 @@ def load_user(user_id):
 
 @app.route('/login', methods=["POST"])
 def login():
-    user_id = request.get_json()["accesstoken"]
-    print("user_id in login function",user_id)
-    user = gs.google_token_verification(user_id)
-    print(user.is_active())
+    print("here")
+    user_id = request.get_json()["googleToken"]
+    myToken = request.get_json()["myToken"]
+
+    if (myToken != ""):
+        user = gs.token_Login(myToken)
+    else:
+        print("user_id in login function",user_id)
+        user = gs.google_token_verification(user_id)
+
     if (user is not None):
         login_user(user, remember=True)
-        return jsonify({"ok": True, 'token': user.get_id()})
+        print("user loggedin", user.id)
+        return jsonify({"ok": True, 'token': user.get_token()})
     else:
         return jsonify({"ok": False, "error": "cannot login or signup"})
+
 
 @app.errorhandler(404)
 def not_found(error):

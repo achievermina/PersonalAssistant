@@ -1,7 +1,11 @@
 from flask_login import UserMixin
 from DataBase.dynamoDB import Database
-import logging
-import json
+import jwt, configparser
+
+config = configparser.ConfigParser()
+config.read('./config.ini')
+config.sections()
+JWT_SECRET = config['JWT']['secret']
 
 class User(UserMixin):
     def __init__(self, user_id, email=None, name=None, authenticated=False):
@@ -27,6 +31,10 @@ class User(UserMixin):
 
     def is_authenticated(self):
         return self.authenticated
+
+    def get_token(self):
+        encoded = jwt.encode({'id': self.id, 'email': self.email}, JWT_SECRET, algorithm='HS256')
+        return str(encoded)
 
     def __repr__(self):
         return " "
