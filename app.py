@@ -7,7 +7,6 @@ from flask_cors import CORS
 import logging
 from flask import Flask, redirect, url_for, session, render_template, request
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
-import jwt
 
 SECRET_KEY = 'development key'
 app = Flask(__name__)
@@ -26,19 +25,29 @@ def load_user(user_id):
 @app.route('/login', methods=["POST"])
 def login():
     print("here")
-    user_id = request.get_json()["googleToken"]
+    googleToken = request.get_json()["googleToken"]
     myToken = request.get_json()["myToken"]
 
     if (myToken != ""):
         user = gs.token_Login(myToken)
     else:
-        print("user_id in login function",user_id)
-        user = gs.google_token_verification(user_id)
+        print("google Token in login function", googleToken)
+        user = gs.google_token_verification(googleToken)
 
     if (user is not None):
         login_user(user, remember=True)
         print("user loggedin", user.id)
         return jsonify({"ok": True, 'token': user.get_token()})
+    else:
+        return jsonify({"ok": False, "error": "cannot login or signup"})
+
+
+@app.route('/calendar', methods=["GET"])
+def get_calendar():
+    print("calendar here")
+
+    if session.get('logged_in') is not None:
+        calendar = gc.GoogleCanlandarAPI()
     else:
         return jsonify({"ok": False, "error": "cannot login or signup"})
 
@@ -63,5 +72,5 @@ def add():
     return jsonify({'sum': int(data['a']) + int(data['b'])})
 
 if __name__ == "__main__":
-    logging.getLogger('flask_cors').level = logging.DEBUG
+    # logging.getLogger('flask_cors').level = logging.DEBUG
     app.run(ssl_context="adhoc") #
