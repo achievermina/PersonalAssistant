@@ -9,11 +9,13 @@ config = configparser.ConfigParser()
 config.read('../config.ini')
 config.sections()
 
+
 idinfo = {'sub':"103024693605393501437", 'email':'hhhhhhheheheh@gmail.com', "name":"missssna", "expires_at":123, "email_verified":False}
 
 def google_token_verification(accessToken):
-    GOOGLE_CLIENT_ID = config['google']['client_id']
-    GOOGLE_CLIENT_SECRET = config['google']['client_secret']
+    # GOOGLE_CLIENT_ID = config['google']['client_id']
+    # GOOGLE_CLIENT_ID // add client ID directly
+    # GOOGLE_CLIENT_SECRET = config['google']['client_secret']
 
     try:
         print("accesstoken in gs", accessToken)

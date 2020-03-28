@@ -24,7 +24,7 @@ def load_user(user_id):
 
 @app.route('/login', methods=["POST"])
 def login():
-    print("here")
+    print("here", request.get_json())
     googleToken = request.get_json()["googleToken"]
     myToken = request.get_json()["myToken"]
 
@@ -72,5 +72,7 @@ def add():
     return jsonify({'sum': int(data['a']) + int(data['b'])})
 
 if __name__ == "__main__":
-    # logging.getLogger('flask_cors').level = logging.DEBUG
-    app.run(ssl_context="adhoc") #
+    logging.getLogger('flask_cors').level = logging.DEBUG
+    # app.run(ssl_context="adhoc") #
+    app.run()
+
