@@ -12,14 +12,16 @@ import bcrypt
 
 class GoogleCanlandarAPI:
     def __init__(self):
-        self.connect_calandar()
+        self.credentials = self.connect_calandar()
         self.db = Database()
+        self.service = build("calendar","v3", credentials = self.credentials)
 
     def connect_calandar(self):
         scopes = ['https://www.googleapis.com/auth/calendar']
         flow = InstalledAppFlow.from_client_secrets_file('./Credentials/client_calendar_other2.json', scopes=scopes)
         credentials = flow.run_console()
         print(credentials)
+        return credentials
         # self. store_password("hi", credentials)
 
     def store_password(self, email, credentials):
@@ -32,12 +34,16 @@ class GoogleCanlandarAPI:
         print(email, hashedCredentials)
 
     def add_event(self, user, event):
-        event = service.events().insert(calendarId='primary', body=event).execute()
+        event = self.service.events().insert(calendarId='primary', body=event).execute()
 
+    def get_event(self):
+        event = self.service.events().get(calendarId='primary', eventId='eventId').execute()
+        print(event['summary'])
 
 
 if __name__ == '__main__':
     c = GoogleCanlandarAPI()
+    c.get_event()
     event = {
         'summary': 'Google I/O 2015',
         'location': '800 Howard St., San Francisco, CA 94103',
