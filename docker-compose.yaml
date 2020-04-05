@@ -4,6 +4,12 @@ volumes:
   dynamodb_data:
 
 services:
+  app:
+    image: flask-personalassistant-app
+    build: .
+    ports:
+      - "5000:5000"
+
   dynamodb:
     image: amazon/dynamodb-local
     hostname: dynamodb-local
@@ -12,6 +18,10 @@ services:
       - dynamodb_data:/home/dynamodblocal/data
     ports:
       - "8042:8000"
+
+
+
+
 
 
 # create database
