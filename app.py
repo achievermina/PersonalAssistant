@@ -7,6 +7,8 @@ from flask_cors import CORS
 import logging
 from flask import Flask, redirect, url_for, session, render_template, request
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
+import grpc
+from gRPC import indeedclone_pb2, indeedclone_pb2_grpc
 
 SECRET_KEY = 'development key'
 app = Flask(__name__)
@@ -60,6 +62,26 @@ def not_found(error):
 def main():
     return '''<h2>hi</h2>'''
 
+@app.route('/indeedclone')
+def search(searchTerm):
+    print("Start service")
+    try:
+      channel = grpc.insecure_channel('localhost:3000')
+      stub = indeedclone_pb2_grpc.jobServiceStub(channel)
+      countryRequest = indeedclone_pb2.searchRequest(name=searchTerm)
+      searchResponse = stub.search(countryRequest)
+      # need to change the list of the object
+      return jsonify({
+          "id": searchResponse.id,
+          "title": searchResponse.title,
+          "location": searchResponse.location,
+          "salary": searchResponse.salary,
+          "summary": searchResponse.summary
+      })
+    except Exception as e:
+      print(e)
+      return e
+
 @app.route('/test-items')
 def test_items():
     db = Database()
@@ -74,5 +96,5 @@ def add():
 if __name__ == "__main__":
     logging.getLogger('flask_cors').level = logging.DEBUG
     # app.run(ssl_context="adhoc") #
-    app.run()
+    app.run(host='0.0.0.0')
 
