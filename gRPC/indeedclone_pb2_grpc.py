@@ -14,7 +14,7 @@ class jobServiceStub(object):
             channel: A grpc.Channel.
         """
         self.Search = channel.unary_unary(
-                '/indeedclone.jobService/Search',
+                '/scrapper.jobService/Search',
                 request_serializer=gRPC_dot_indeedclone__pb2.searchRequest.SerializeToString,
                 response_deserializer=gRPC_dot_indeedclone__pb2.searchResponse.FromString,
                 )
@@ -39,7 +39,7 @@ def add_jobServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'indeedclone.jobService', rpc_method_handlers)
+            'scrapper.jobService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
@@ -57,7 +57,7 @@ class jobService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/indeedclone.jobService/Search',
+        return grpc.experimental.unary_unary(request, target, '/scrapper.jobService/Search',
             gRPC_dot_indeedclone__pb2.searchRequest.SerializeToString,
             gRPC_dot_indeedclone__pb2.searchResponse.FromString,
             options, channel_credentials,

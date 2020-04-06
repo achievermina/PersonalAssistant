@@ -15,10 +15,10 @@ _sym_db = _symbol_database.Default()
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='gRPC/indeedclone.proto',
-  package='indeedclone',
+  package='scrapper',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=b'\n\x16gRPC/indeedclone.proto\x12\x0bindeedclone\"\x1d\n\rsearchRequest\x12\x0c\n\x04term\x18\x01 \x01(\t\"Y\n\tjobObject\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x10\n\x08location\x18\x03 \x01(\t\x12\x0e\n\x06salary\x18\x04 \x01(\t\x12\x0f\n\x07summary\x18\x05 \x01(\t\"6\n\x0esearchResponse\x12$\n\x04jobs\x18\x01 \x03(\x0b\x32\x16.indeedclone.jobObject2Q\n\njobService\x12\x43\n\x06Search\x12\x1a.indeedclone.searchRequest\x1a\x1b.indeedclone.searchResponse\"\x00\x62\x06proto3'
+  serialized_pb=b'\n\x16gRPC/indeedclone.proto\x12\x08scrapper\"\x1d\n\rsearchRequest\x12\x0c\n\x04term\x18\x01 \x01(\t\"Y\n\tjobObject\x12\n\n\x02id\x18\x01 \x01(\t\x12\r\n\x05title\x18\x02 \x01(\t\x12\x10\n\x08location\x18\x03 \x01(\t\x12\x0e\n\x06salary\x18\x04 \x01(\t\x12\x0f\n\x07summary\x18\x05 \x01(\t\"3\n\x0esearchResponse\x12!\n\x04jobs\x18\x01 \x03(\x0b\x32\x13.scrapper.jobObject2K\n\njobService\x12=\n\x06Search\x12\x17.scrapper.searchRequest\x1a\x18.scrapper.searchResponse\"\x00\x62\x06proto3'
 )
 
 
@@ -26,13 +26,13 @@ DESCRIPTOR = _descriptor.FileDescriptor(
 
 _SEARCHREQUEST = _descriptor.Descriptor(
   name='searchRequest',
-  full_name='indeedclone.searchRequest',
+  full_name='scrapper.searchRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='term', full_name='indeedclone.searchRequest.term', index=0,
+      name='term', full_name='scrapper.searchRequest.term', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -50,48 +50,48 @@ _SEARCHREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=39,
-  serialized_end=68,
+  serialized_start=36,
+  serialized_end=65,
 )
 
 
 _JOBOBJECT = _descriptor.Descriptor(
   name='jobObject',
-  full_name='indeedclone.jobObject',
+  full_name='scrapper.jobObject',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='indeedclone.jobObject.id', index=0,
+      name='id', full_name='scrapper.jobObject.id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='title', full_name='indeedclone.jobObject.title', index=1,
+      name='title', full_name='scrapper.jobObject.title', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='location', full_name='indeedclone.jobObject.location', index=2,
+      name='location', full_name='scrapper.jobObject.location', index=2,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='salary', full_name='indeedclone.jobObject.salary', index=3,
+      name='salary', full_name='scrapper.jobObject.salary', index=3,
       number=4, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='summary', full_name='indeedclone.jobObject.summary', index=4,
+      name='summary', full_name='scrapper.jobObject.summary', index=4,
       number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -109,20 +109,20 @@ _JOBOBJECT = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=70,
-  serialized_end=159,
+  serialized_start=67,
+  serialized_end=156,
 )
 
 
 _SEARCHRESPONSE = _descriptor.Descriptor(
   name='searchResponse',
-  full_name='indeedclone.searchResponse',
+  full_name='scrapper.searchResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='jobs', full_name='indeedclone.searchResponse.jobs', index=0,
+      name='jobs', full_name='scrapper.searchResponse.jobs', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -140,8 +140,8 @@ _SEARCHRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=161,
-  serialized_end=215,
+  serialized_start=158,
+  serialized_end=209,
 )
 
 _SEARCHRESPONSE.fields_by_name['jobs'].message_type = _JOBOBJECT
@@ -153,21 +153,21 @@ _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 searchRequest = _reflection.GeneratedProtocolMessageType('searchRequest', (_message.Message,), {
   'DESCRIPTOR' : _SEARCHREQUEST,
   '__module__' : 'gRPC.indeedclone_pb2'
-  # @@protoc_insertion_point(class_scope:indeedclone.searchRequest)
+  # @@protoc_insertion_point(class_scope:scrapper.searchRequest)
   })
 _sym_db.RegisterMessage(searchRequest)
 
 jobObject = _reflection.GeneratedProtocolMessageType('jobObject', (_message.Message,), {
   'DESCRIPTOR' : _JOBOBJECT,
   '__module__' : 'gRPC.indeedclone_pb2'
-  # @@protoc_insertion_point(class_scope:indeedclone.jobObject)
+  # @@protoc_insertion_point(class_scope:scrapper.jobObject)
   })
 _sym_db.RegisterMessage(jobObject)
 
 searchResponse = _reflection.GeneratedProtocolMessageType('searchResponse', (_message.Message,), {
   'DESCRIPTOR' : _SEARCHRESPONSE,
   '__module__' : 'gRPC.indeedclone_pb2'
-  # @@protoc_insertion_point(class_scope:indeedclone.searchResponse)
+  # @@protoc_insertion_point(class_scope:scrapper.searchResponse)
   })
 _sym_db.RegisterMessage(searchResponse)
 
@@ -175,16 +175,16 @@ _sym_db.RegisterMessage(searchResponse)
 
 _JOBSERVICE = _descriptor.ServiceDescriptor(
   name='jobService',
-  full_name='indeedclone.jobService',
+  full_name='scrapper.jobService',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=217,
-  serialized_end=298,
+  serialized_start=211,
+  serialized_end=286,
   methods=[
   _descriptor.MethodDescriptor(
     name='Search',
-    full_name='indeedclone.jobService.Search',
+    full_name='scrapper.jobService.Search',
     index=0,
     containing_service=None,
     input_type=_SEARCHREQUEST,

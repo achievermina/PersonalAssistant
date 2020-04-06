@@ -1,6 +1,7 @@
 syntax = "proto3";
 
-package indeedclone;
+package scrapper;
+
 
 message searchRequest {
     string term =1;
@@ -21,3 +22,4 @@ message searchResponse {
 service jobService {
     rpc Search(searchRequest) returns (searchResponse){}
 }
+

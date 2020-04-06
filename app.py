@@ -68,19 +68,13 @@ def search(searchTerm):
     try:
       channel = grpc.insecure_channel('localhost:3000')
       stub = indeedclone_pb2_grpc.jobServiceStub(channel)
-      countryRequest = indeedclone_pb2.searchRequest(name=searchTerm)
-      searchResponse = stub.search(countryRequest)
-      # need to change the list of the object
-      return jsonify({
-          "id": searchResponse.id,
-          "title": searchResponse.title,
-          "location": searchResponse.location,
-          "salary": searchResponse.salary,
-          "summary": searchResponse.summary
-      })
+      response = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
+      return response
+
     except Exception as e:
       print(e)
       return e
+
 
 @app.route('/test-items')
 def test_items():
