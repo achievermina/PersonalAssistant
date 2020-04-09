@@ -2,10 +2,9 @@ from flask_login import UserMixin
 from DataBase.dynamoDB import Database
 import jwt
 import configparser
+from os import environ
 
-config = configparser.ConfigParser()
-config.read('config.ini')
-config.sections()
+JWT_SECRET = environ.get('JWT_SECRET')
 
 class User(UserMixin):
     def __init__(self, user_id, email=None, name=None, authenticated=False):
@@ -14,7 +13,6 @@ class User(UserMixin):
         self.name = name
         self.authenticated = authenticated
         self.active = True
-        JWT_SECRET = config['JWT']['secret']
 
     @staticmethod
     def get(user_id):

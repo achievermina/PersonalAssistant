@@ -4,21 +4,16 @@ from API.User import User
 import configparser
 from google.oauth2 import id_token
 from google.auth.transport import requests
-
-config = configparser.ConfigParser()
-config.read('../config.ini')
-config.sections()
-
+from os import environ
 
 idinfo = {'sub':"103024693605393501437", 'email':'hhhhhhheheheh@gmail.com', "name":"missssna", "expires_at":123, "email_verified":False}
 
 def google_token_verification(accessToken):
-    # GOOGLE_CLIENT_ID = config['google']['client_id']
-    # GOOGLE_CLIENT_ID // add client ID directly
-    # GOOGLE_CLIENT_SECRET = config['google']['client_secret']
-
+    GOOGLE_CLIENT_ID = environ.get('GOOGLE_CLIENT_ID')
+    GOOGLE_CLIENT_SECRET= environ.get('GOOGLE_CLIENT_SECRET')
+    print(GOOGLE_CLIENT_ID)
     try:
-        print("accesstoken in gs", accessToken)
+        #print("accesstoken in gs", accessToken)
         idinfo = id_token.verify_oauth2_token(accessToken, requests.Request(), GOOGLE_CLIENT_ID)
         print("here", idinfo)
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:

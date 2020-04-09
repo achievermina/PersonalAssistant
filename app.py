@@ -3,7 +3,7 @@ from API.User import User
 import API.googleSignIn  as gs
 import API.googleCalandar  as gc
 from flask import Flask, jsonify, make_response
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import logging
 from flask import Flask, redirect, url_for, session, render_template, request
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
@@ -17,7 +17,9 @@ app.secret_key = SECRET_KEY
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+#cors = CORS(app, resources={r"/*": {"origins": "*"}})
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
+#cors = CORS(app)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -25,6 +27,8 @@ def load_user(user_id):
     return User.get(user_id)
 
 @app.route('/login', methods=["POST"])
+@cross_origin("*")
+@cross_origin(origin='localhost:3000',headers=['Content-Type','Authorization'])
 def login():
     print("here", request.get_json())
     googleToken = request.get_json()["googleToken"]
@@ -39,10 +43,12 @@ def login():
     if (user is not None):
         login_user(user, remember=True)
         print("user loggedin", user.id)
-        return jsonify({"ok": True, 'token': user.get_token()})
+        response = jsonify({"ok": True, 'token': user.get_token()})
     else:
-        return jsonify({"ok": False, "error": "cannot login or signup"})
+        response = jsonify({"ok": False, "error": "cannot login or signup"})
 
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 @app.route('/calendar', methods=["GET"])
 def get_calendar():
@@ -62,9 +68,10 @@ def not_found(error):
 def main():
     return '''<h2>hi</h2>'''
 
-@app.route('/indeedclone')
-def search(searchTerm):
+@app.route('/indeedclone',methods=["GET"])
+def search():
     print("Start service")
+    searchTerm = request.get_json()["term"]
     try:
       channel = grpc.insecure_channel('localhost:3000')
       stub = indeedclone_pb2_grpc.jobServiceStub(channel)
@@ -90,5 +97,5 @@ def add():
 if __name__ == "__main__":
     logging.getLogger('flask_cors').level = logging.DEBUG
     # app.run(ssl_context="adhoc") #
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)
 
