@@ -9,6 +9,8 @@ services:
     build: .
     ports:
       - "5000:5000"
+    volumes:
+      - .:/app
 
   dynamodb:
     image: amazon/dynamodb-local
@@ -19,6 +21,7 @@ services:
     ports:
       - "8042:8000"
 
+#    command: "aws dynamodb --endpoint-url http://localhost:8042 create-table --table-name user-info --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5"
 
 
 
