@@ -17,9 +17,8 @@ app.secret_key = SECRET_KEY
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-#cors = CORS(app, resources={r"/*": {"origins": "*"}})
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
-#cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -27,12 +26,13 @@ def load_user(user_id):
     return User.get(user_id)
 
 @app.route('/login', methods=["POST"])
-@cross_origin("*")
-@cross_origin(origin='localhost:3000',headers=['Content-Type','Authorization'])
+@cross_origin()
 def login():
     print("here", request.get_json())
     googleToken = request.get_json()["googleToken"]
     myToken = request.get_json()["myToken"]
+    # myToken = ""
+    # googleToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjZmY2Y0MTMyMjQ3NjUxNTZiNDg3NjhhNDJmYWMwNjQ5NmEzMGZmNWEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiMjYzOTEyODkxNDAyLTYyMWZrcmxoZDliZDcxZTRtZTlmanNlNWp0dnMxMm9qLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiMjYzOTEyODkxNDAyLTYyMWZrcmxoZDliZDcxZTRtZTlmanNlNWp0dnMxMm9qLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTAzMDI0NjkzNjA1MzkzNTAxNDM3IiwiZW1haWwiOiJtaW5hbGVlNjU0M0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6IklCVGpzcUY5a1VFaXJYcms4WVNsWGciLCJuYW1lIjoiQWNoaWV2ZXIgTGVlIiwicGljdHVyZSI6Imh0dHBzOi8vbGg2Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tNDVRVjJCaExUUFUvQUFBQUFBQUFBQUkvQUFBQUFBQUFBQUEvQUFLV0pKT3RNTF8tdHNOMjJJY29VNmgydDZrWGVpSnNYQS9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiQWNoaWV2ZXIiLCJmYW1pbHlfbmFtZSI6IkxlZSIsImxvY2FsZSI6ImVuIiwiaWF0IjoxNTg2NTk4ODA0LCJleHAiOjE1ODY2MDI0MDQsImp0aSI6ImRiNGFmNzc5ZDc4N2E4NDM2MjRkZDAyMGVjZGJjNTBiMDZlZTk1NmUifQ.EkFB3rYYbQWHK4nBtm5Ci4ui8z_T0zdSQ3KZDkyhJgcNEdKxZvtrtfg86Xgcd2myzMwZQitt3NGLsU0fQVYOPE9xKqyC3Cu_nHOFD1Zx8o9YKWxPQyS5Zke6v4_Tj7Lx_lxoDcHYLfEXOlZZm - w2e_zG9iSOhDI7mJHxtN43rRRD9eZGq85BdR_ZND96d1qmBskG6rkJmNVH2mhRUbjGCT2PukFQbME8OFXWCK1bMWZXL8XvgF1_SWfFwQSyzP7aBB4Yusy2kmbs9SDcD3eeqp3WE0WlYRg4jA493IWtbRFcoqKBbJJidBWycMG0D2g8hSUeZHvhhwu2bTC6NYeTYw"
 
     if (myToken != ""):
         user = gs.token_Login(myToken)
@@ -47,7 +47,6 @@ def login():
     else:
         response = jsonify({"ok": False, "error": "cannot login or signup"})
 
-    response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 @app.route('/calendar', methods=["GET"])

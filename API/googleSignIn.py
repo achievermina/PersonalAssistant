@@ -4,14 +4,15 @@ from API.User import User
 import configparser
 from google.oauth2 import id_token
 from google.auth.transport import requests
-from os import environ
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 idinfo = {'sub':"103024693605393501437", 'email':'hhhhhhheheheh@gmail.com', "name":"missssna", "expires_at":123, "email_verified":False}
 
 def google_token_verification(accessToken):
-    GOOGLE_CLIENT_ID = environ.get('GOOGLE_CLIENT_ID')
-    GOOGLE_CLIENT_SECRET= environ.get('GOOGLE_CLIENT_SECRET')
-    print(GOOGLE_CLIENT_ID)
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+
     try:
         #print("accesstoken in gs", accessToken)
         idinfo = id_token.verify_oauth2_token(accessToken, requests.Request(), GOOGLE_CLIENT_ID)
@@ -31,7 +32,7 @@ def google_token_verification(accessToken):
             "id":  idinfo["sub"],
             "email": idinfo["email"],
             "name": idinfo["name"],
-            "expires_at": idinfo["expires_at"],
+            "expires_at": idinfo["exp"],
             "authenticated": idinfo["email_verified"]
         }
         if add_user_to_database(newUser):
