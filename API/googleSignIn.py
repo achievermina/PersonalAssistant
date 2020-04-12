@@ -6,6 +6,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 idinfo = {'sub':"103024693605393501437", 'email':'hhhhhhheheheh@gmail.com', "name":"missssna", "expires_at":123, "email_verified":False}
@@ -16,17 +17,17 @@ def google_token_verification(accessToken):
     try:
         #print("accesstoken in gs", accessToken)
         idinfo = id_token.verify_oauth2_token(accessToken, requests.Request(), GOOGLE_CLIENT_ID)
-        print("here", idinfo)
+        print("here id info", idinfo)
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             raise ValueError('Wrong issuer.')
         user_id = idinfo['sub']
-        print("accesstoken in google", user_id)
+        logging.info("accesstoken in google %s", user_id)
 
     except ValueError:
         return
 
     user = User.get(user_id)
-    print("user get:", user)
+    logging.info("user get: %s", user)
     if user is None:
         newUser = {
             "id":  idinfo["sub"],
@@ -37,7 +38,7 @@ def google_token_verification(accessToken):
         }
         if add_user_to_database(newUser):
             user = User.get(user_id)
-            print("user added :", user)
+            logging.info("user added : %s", user)
         else:
             return
     return user

@@ -35,6 +35,16 @@ services:
 ###  로그가 안보임
 ###  죽으나 사나 모름
 
+#도커에 올리면 도커내부의 로컬호스트는 외부에서의 로컬호스트로 접속이 안됨
+#docker inspect #세션 아이디를 써서 현재 도커의 hostname을 찾아야함
+
+
+
+#create table in docker
+#docker exec -it personalassistant_app_1 /bin/bash -c 'aws dynamodb --endpoint-url http://host.docker.internal:8042 create-table --table-name user-info --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5'
+
+
+
 
 
 

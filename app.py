@@ -37,13 +37,13 @@ def login():
     if (myToken != ""):
         user = gs.token_Login(myToken)
     else:
-        print("google Token in login function", googleToken)
+        logging.info("google Token in login function %s", googleToken)
         user = gs.google_token_verification(googleToken)
 
     if (user is not None):
         login_user(user, remember=True)
-        print("user loggedin", user.id)
-        response = jsonify({"ok": True, 'token': user.get_token()})
+        logging.info("user loggedin %s", user.id)
+        response = jsonify({"ok": True, 'token': user.get_token(), 'user':user})
     else:
         response = jsonify({"ok": False, "error": "cannot login or signup"})
 
