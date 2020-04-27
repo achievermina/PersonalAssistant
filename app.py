@@ -1,10 +1,12 @@
+import sys
+
 from DataBase.dynamoDB import Database
 from API.User import User
 import API.googleSignIn  as gs
 import API.googleCalandar  as gc
 from flask import Flask, jsonify, make_response
 from flask_cors import CORS, cross_origin
-import logging
+import logging, json
 from flask import Flask, redirect, url_for, session, render_template, request
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 import grpc
@@ -28,26 +30,38 @@ def load_user(user_id):
 @app.route('/login', methods=["POST"])
 @cross_origin()
 def login():
-    print("here", request.get_json())
-    googleToken = request.get_json()["googleToken"]
-    myToken = request.get_json()["myToken"]
-    # myToken = ""
-    # googleToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IjZmY2Y0MTMyMjQ3NjUxNTZiNDg3NjhhNDJmYWMwNjQ5NmEzMGZmNWEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiYXpwIjoiMjYzOTEyODkxNDAyLTYyMWZrcmxoZDliZDcxZTRtZTlmanNlNWp0dnMxMm9qLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiYXVkIjoiMjYzOTEyODkxNDAyLTYyMWZrcmxoZDliZDcxZTRtZTlmanNlNWp0dnMxMm9qLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwic3ViIjoiMTAzMDI0NjkzNjA1MzkzNTAxNDM3IiwiZW1haWwiOiJtaW5hbGVlNjU0M0BnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXRfaGFzaCI6IklCVGpzcUY5a1VFaXJYcms4WVNsWGciLCJuYW1lIjoiQWNoaWV2ZXIgTGVlIiwicGljdHVyZSI6Imh0dHBzOi8vbGg2Lmdvb2dsZXVzZXJjb250ZW50LmNvbS8tNDVRVjJCaExUUFUvQUFBQUFBQUFBQUkvQUFBQUFBQUFBQUEvQUFLV0pKT3RNTF8tdHNOMjJJY29VNmgydDZrWGVpSnNYQS9zOTYtYy9waG90by5qcGciLCJnaXZlbl9uYW1lIjoiQWNoaWV2ZXIiLCJmYW1pbHlfbmFtZSI6IkxlZSIsImxvY2FsZSI6ImVuIiwiaWF0IjoxNTg2NTk4ODA0LCJleHAiOjE1ODY2MDI0MDQsImp0aSI6ImRiNGFmNzc5ZDc4N2E4NDM2MjRkZDAyMGVjZGJjNTBiMDZlZTk1NmUifQ.EkFB3rYYbQWHK4nBtm5Ci4ui8z_T0zdSQ3KZDkyhJgcNEdKxZvtrtfg86Xgcd2myzMwZQitt3NGLsU0fQVYOPE9xKqyC3Cu_nHOFD1Zx8o9YKWxPQyS5Zke6v4_Tj7Lx_lxoDcHYLfEXOlZZm - w2e_zG9iSOhDI7mJHxtN43rRRD9eZGq85BdR_ZND96d1qmBskG6rkJmNVH2mhRUbjGCT2PukFQbME8OFXWCK1bMWZXL8XvgF1_SWfFwQSyzP7aBB4Yusy2kmbs9SDcD3eeqp3WE0WlYRg4jA493IWtbRFcoqKBbJJidBWycMG0D2g8hSUeZHvhhwu2bTC6NYeTYw"
-
-    if (myToken != ""):
-        user = gs.token_Login(myToken)
-    else:
-        logging.info("google Token in login function %s", googleToken)
-        user = gs.google_token_verification(googleToken)
+    googleToken = request.get_json().get("googleToken")
+    user = gs.google_token_verification(googleToken)
 
     if (user is not None):
         login_user(user, remember=True)
-        logging.info("user loggedin %s", user.id)
-        response = jsonify({"ok": True, 'token': user.get_token(), 'user':user})
+        try:
+            response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON()})
+        except Exception as e:
+            logging.info('error %s', e)
+
     else:
         response = jsonify({"ok": False, "error": "cannot login or signup"})
 
     return response
+
+
+@app.route('/cookielogin', methods=["POST"])
+def cookielogin():
+    token = request.get_json().get("jwt")
+    logging.info("getting encoded token %s type %s", token, type(token))
+    user = gs.token_Login(token)
+
+    if (user is not None):
+        login_user(user, remember=True)
+
+        response = jsonify({"ok": True, "token": user.get_token().decode('utf-8'), 'user':user.toJSON()})
+        logging.info("user cookie loggedin %s", user.id)
+    else:
+        response = jsonify({"ok": False, "token": "", 'user':None})
+
+    return response
+
 
 @app.route('/calendar', methods=["GET"])
 def get_calendar():
@@ -67,12 +81,12 @@ def not_found(error):
 def main():
     return '''<h2>hi</h2>'''
 
-@app.route('/indeedclone',methods=["GET"])
+@app.route('/indeedclone',methods=["POST"])
 def search():
-    print("Start service")
+    logging.fatal("Start service")
     searchTerm = request.get_json()["term"]
     try:
-      channel = grpc.insecure_channel('localhost:3000')
+      channel = grpc.insecure_channel('0.0.0.0:3000')
       stub = indeedclone_pb2_grpc.jobServiceStub(channel)
       response = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
       return response
@@ -95,6 +109,11 @@ def add():
 
 if __name__ == "__main__":
     logging.getLogger('flask_cors').level = logging.DEBUG
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.INFO)
+
     # app.run(ssl_context="adhoc") #
     app.run(host='0.0.0.0', debug=True)
 
