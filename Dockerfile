@@ -13,6 +13,8 @@ RUN pip install -r requirements.txt
 COPY . /app
 
 EXPOSE 5000
-ENTRYPOINT [ "python" ]
-CMD [ "app.py"]
+ENTRYPOINT []
+# entry point를 override 한뒤에 command 에 사용
 
+#ENTRYPOINT "python"
+#CMD [ "app.py"]

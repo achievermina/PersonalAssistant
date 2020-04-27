@@ -11,6 +11,17 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
+    environment:
+      PYTHONBUFFERED: 1
+      AWS_ACCESS_KEY_ID: "id"
+      AWS_SECRET_ACCESS_KEY: "key"
+      AWS_DEFAULT_REGION: "us-east-1"
+    entrypoint:
+      python
+    command: [
+#      "python",
+      "app.py"
+    ]
 
   dynamodb:
     image: amazon/dynamodb-local
@@ -19,7 +30,18 @@ services:
     volumes:
       - dynamodb_data:/home/dynamodblocal/data
     ports:
-      - "8042:8000"
+      - "8000"
+# 8042 local 접속  # 오른쪽은 컨테이너에서 접속하는 포트
+  initializer:
+    image: amazon/aws-cli
+    volumes:
+     - ./init.sh:/app/init.sh
+    command: /app/init.sh
+    entrypoint: /bin/sh
+    environment:
+      AWS_ACCESS_KEY_ID: "id"
+      AWS_SECRET_ACCESS_KEY: "key"
+      AWS_DEFAULT_REGION: "us-east-1"
 
 #    command: "aws dynamodb --endpoint-url http://localhost:8042 create-table --table-name user-info --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5"
 
