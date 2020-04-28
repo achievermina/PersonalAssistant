@@ -35,7 +35,7 @@ def google_token_verification(accessToken):
         }
         if add_user_to_database(newUser):
             user = User.get(user_id)
-            logging.info("user added : %s", user)
+            logging.info("database user added : %s, id type %s", user.get_id(), type(user_id) )
         else:
             return
     return user
@@ -50,19 +50,18 @@ def add_user_to_database(user):
 
     return False
 
-def token_Login(myToken): ## 그냥 토큰자체를 저장하고 토큰이 같은지 확인? 아니면 해독해서 확인?
+def token_Login(myToken):
     try:
         JWT_SECRET = os.getenv("JWT_SECRET")
         decoded = jwt.decode(myToken, JWT_SECRET, 'HS256')
+        logging.info("user decoded token %s", decoded)
+
     except Exception as e:
         logging.info("err %s", e)
 
-
     user = User.get(decoded["id"])
-    logging.info("getting user  %s", user.id)
 
-    if user is not None:
-        return user
+    return user
 
 
 if __name__ == "__main__":
