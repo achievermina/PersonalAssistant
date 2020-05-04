@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  app:
+    image: flask-personalassistant-app  # 현재 로컬 도커에 빌드가 되어 있어서 ecs-cli push nginx  만 해도 알아서 올라
+    build: .
+
+  nginx:
+    image: nginx
+    build: ./nginx
