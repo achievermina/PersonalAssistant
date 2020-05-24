@@ -23,6 +23,14 @@ services:
       "app.py"
     ]
 
+  nginx:
+    image: nginx  #nginx 는 프로그램이름  -- > 역할은 proxy
+    build: ./nginx
+    ports:
+      - "80:80"
+    command: /bin/bash -c "sleep 10; exec nginx -g 'daemon off;'"
+
+
   dynamodb:
     image: amazon/dynamodb-local
     hostname: dynamodb-local
@@ -45,24 +53,18 @@ services:
 
 #    command: "aws dynamodb --endpoint-url http://localhost:8042 create-table --table-name user-info --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5"
 
-
-
-
-
-# create database
+#### create database
 
 #docker-compose -f docker-compose.yaml up
-
 # -d: demon --> background 에서 돌리는것
 ###  로그가 안보임
 ###  죽으나 사나 모름
 
-#도커에 올리면 도커내부의 로컬호스트는 외부에서의 로컬호스트로 접속이 안됨
+##### 도커에 올리면 도커내부의 로컬호스트는 외부에서의 로컬호스트로 접속이 안됨
 #docker inspect #세션 아이디를 써서 현재 도커의 hostname을 찾아야함
 
 
-
-#create table in docker
+###create table in docker
 #docker exec -it personalassistant_app_1 /bin/bash -c 'aws dynamodb --endpoint-url http://host.docker.internal:8042 create-table --table-name user-info --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5'
 
 
