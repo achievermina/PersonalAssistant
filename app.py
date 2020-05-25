@@ -3,7 +3,7 @@ import sys
 from DataBase.dynamoDB import Database
 from API.User import User
 import API.googleSignIn  as gs
-import API.googleCalandar  as gc
+import API.googleCalendar2  as gc
 from flask import Flask, jsonify, make_response
 from flask_cors import CORS, cross_origin
 import logging, json
@@ -31,12 +31,15 @@ def load_user(user_id):
 @cross_origin()
 def login():
     googleToken = request.get_json().get("googleToken")
-    user = gs.google_token_verification(googleToken)
-
+    accessToken = request.get_json().get("accessToken")
+    user = gs.google_token_verification(googleToken, accessToken)
+    # events = gc.connect_calandar(accessToken)
+    # logging.info('calendar events %s', events)
     if (user is not None):
         login_user(user, remember=True)
         try:
             response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON()})
+            # response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar':events})
         except Exception as e:
             logging.info('error %s', e)
 
@@ -65,11 +68,11 @@ def cookielogin():
 @app.route('/calendar', methods=["GET"])
 def get_calendar():
     print("calendar here")
+    token = request.get_json().get("jwt")
+    user = gs.token_Login(token)
 
-    if session.get('logged_in') is not None:
-        calendar = gc.GoogleCanlandarAPI()
-    else:
-        return jsonify({"ok": False, "error": "cannot login or signup"})
+    # if (user is not None):
+    #     continue
 
 
 @app.errorhandler(404)
@@ -82,12 +85,14 @@ def main():
 
 @app.route('/indeedclone',methods=["POST"])
 def search():
-    logging.fatal("Start service")
-    searchTerm = request.get_json()["term"]
+    searchTerm = request.get_json()['term']
+    logging.fatal("Start service search term: %s", searchTerm)
     try:
-      channel = grpc.insecure_channel('0.0.0.0:3000')
+      channel = grpc.insecure_channel('0.0.0.0:50051')
       stub = indeedclone_pb2_grpc.jobServiceStub(channel)
       response = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
+      logging.fatal(response)
+
       return response
 
     except Exception as e:

@@ -3,23 +3,23 @@ import logging, jwt
 from API.User import User
 import configparser
 from google.oauth2 import id_token
-# from authlib.client import OAuth2Session
 from google.auth.transport import requests
 import os, sys
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def google_token_verification(accessToken):
+def google_token_verification(idToken, accessToken):
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 
     try:
-        idinfo = id_token.verify_oauth2_token(accessToken, requests.Request(), GOOGLE_CLIENT_ID)
+        idinfo = id_token.verify_oauth2_token(idToken, requests.Request(), GOOGLE_CLIENT_ID)
         if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
             raise ValueError('Wrong issuer.')
         user_id = idinfo['sub']
-        logging.info("accesstoken in google %s", user_id)
-        logging.info("idinfo in google %s", idinfo)
+        logging.info("idToken in google %s", user_id)
+        logging.info("accessToken in google %s", accessToken)
+        # logging.info("idinfo in google %s", idinfo)
     except ValueError:
         return
 
@@ -28,6 +28,7 @@ def google_token_verification(accessToken):
     if user is None:
         newUser = {
             "id":  idinfo["sub"],
+            "accessToken": accessToken,
             "email": idinfo["email"],
             "name": idinfo["name"],
             "expires_at": idinfo["exp"],
@@ -44,6 +45,7 @@ def add_user_to_database(user):
     try:
         db = Database()
         db.add_item("user-info", user)
+        logging.info("Success: adding a new user to DB")
         return True
     except Exception as e:
         logging.info("Adding email: ", user['email'], " failed" , "error", e)

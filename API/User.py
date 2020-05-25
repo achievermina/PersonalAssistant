@@ -6,11 +6,12 @@ from os import environ
 JWT_SECRET = environ.get('JWT_SECRET')
 
 class User(UserMixin):
-    def __init__(self, user_id, email=None, name=None, authenticated=False):
+    def __init__(self, user_id, email=None, name=None, authenticated=False, accessToken=None):
         self.id = user_id
         self.email = email
         self.name = name
         self.authenticated = authenticated
+        self.accessToken = accessToken
         self.active = True
 
     @staticmethod
@@ -18,7 +19,7 @@ class User(UserMixin):
         try:
             db = Database()
             user =  db.read_item("user-info", user_id)
-            current_user = User(user['id'], user['email'], user['name'], user['authenticated'])
+            current_user = User(user['id'], user['email'], user['name'], user['authenticated'], user['accessToken'])
             return current_user
 
         except:
@@ -31,12 +32,17 @@ class User(UserMixin):
         return self.authenticated
 
     def get_token(self):
-        encoded = jwt.encode({'id': self.id, 'email': self.email}, JWT_SECRET, algorithm='HS256')
+        encoded = jwt.encode({'id': self.id, 'email': self.email, 'accessToken': self.accessToken}, JWT_SECRET, algorithm='HS256')
         logging.info("encode type %s", type(encoded))
         return encoded
+
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
     def __repr__(self):
         return " "
+
+def read_token(myToken):
+    decoded = jwt.decode(myToken, JWT_SECRET, 'HS256')
+    return decoded
