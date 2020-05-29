@@ -53,6 +53,8 @@ def add_user_to_database(user):
     return False
 
 def token_Login(myToken):
+    logging.info("token_Login start")
+
     try:
         JWT_SECRET = os.getenv("JWT_SECRET")
         decoded = jwt.decode(myToken, JWT_SECRET, 'HS256')
@@ -61,8 +63,9 @@ def token_Login(myToken):
     except Exception as e:
         logging.info("err %s", e)
 
+    logging.info("try getting user id %s %s", decoded["id"], type(decoded["id"]))
     user = User.get(decoded["id"])
-
+    logging.info("Success: current active user  %s", user.get_id())
     return user
 
 

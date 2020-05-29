@@ -1,4 +1,5 @@
 import boto3
+import logging
 
 
 class Database:
@@ -11,9 +12,14 @@ class Database:
         return response
 
     def read_item(self, table_name, pk_value1):
-        table = self.dynamo_client.Table(table_name)
-        response = table.get_item(Key={'id': pk_value1})
-        return response['Item']
+        logging.info("reading item in database %s",pk_value1)
+        try:
+            table = self.dynamo_client.Table(table_name)
+            response = table.get_item(Key={'id': pk_value1})
+            return response['Item']
+        except Exception as err:
+            logging.info("Error: reading a user in the database %s", err)
+            return None
 
     def read_all_item(self, table_name):
         table = self.dynamo_client.Table(table_name)

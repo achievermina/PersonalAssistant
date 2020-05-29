@@ -33,7 +33,7 @@ def login():
     googleToken = request.get_json().get("googleToken")
     accessToken = request.get_json().get("accessToken")
     user = gs.google_token_verification(googleToken, accessToken)
-    # events = gc.connect_calandar(accessToken)
+    # events = gc.get_events(accessToken)
     # logging.info('calendar events %s', events)
     if (user is not None):
         login_user(user, remember=True)
@@ -52,7 +52,7 @@ def login():
 @app.route('/cookielogin', methods=["POST"])
 def cookielogin():
     token = request.get_json().get("jwt")
-    logging.info("getting encoded token %s type %s", token, type(token))
+    logging.info("getting encoded token %s type %s in cookielogin function", token, type(token))
     user = gs.token_Login(token)
 
     if (user is not None):

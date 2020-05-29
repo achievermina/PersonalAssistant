@@ -43,8 +43,8 @@ services:
   initializer:
     image: amazon/aws-cli
     volumes:
-     - ./init.sh:/app/init.sh
-    command: /app/init.sh
+     - ./Settings/init.sh:/app/Settings/init.sh
+    command: /app/Settings/init.sh
     entrypoint: /bin/sh
     environment:
       AWS_ACCESS_KEY_ID: "id"
