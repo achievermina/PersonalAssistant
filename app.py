@@ -3,7 +3,7 @@ import sys
 from DataBase.dynamoDB import Database
 from API.User import User, read_token
 import API.googleSignIn  as gs
-import API.googleCalendar2  as gc
+import API.googleCalendar  as gc
 from flask import Flask, jsonify, make_response
 from flask_cors import CORS, cross_origin
 import logging, json
@@ -59,7 +59,6 @@ def cookielogin():
     accessToken = decoded.get('accessToken')
     email = decoded.get('email')
     events = gc.get_events(accessToken, email)
-    # formatted_events = gc.parse_events(events)
     logging.info('calendar events %s', type(events))
 
     if (user is not None):
@@ -70,17 +69,6 @@ def cookielogin():
         response = jsonify({"ok": False, "token": "", 'user':None})
 
     return response
-
-
-# @app.route('/calendar', methods=["GET"])
-# def get_calendar():
-#     print("calendar here")
-#     token = request.get_json().get("jwt")
-#     user = gs.token_Login(token)
-#
-#     # if (user is not None):
-#     #     continue
-
 
 @app.errorhandler(404)
 def not_found(error):
