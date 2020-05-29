@@ -1,14 +1,14 @@
 import sys
 
 from DataBase.dynamoDB import Database
-from API.User import User
+from API.User import User, read_token
 import API.googleSignIn  as gs
 import API.googleCalendar2  as gc
 from flask import Flask, jsonify, make_response
 from flask_cors import CORS, cross_origin
 import logging, json
-from flask import Flask, redirect, url_for, session, render_template, request
-from flask_login import LoginManager, current_user, login_required, login_user, logout_user
+from flask import Flask, request
+from flask_login import LoginManager, login_user
 import grpc
 from gRPC import indeedclone_pb2, indeedclone_pb2_grpc
 
@@ -33,13 +33,12 @@ def login():
     googleToken = request.get_json().get("googleToken")
     accessToken = request.get_json().get("accessToken")
     user = gs.google_token_verification(googleToken, accessToken)
-    # events = gc.get_events(accessToken)
-    # logging.info('calendar events %s', events)
+    events = gc.get_events(accessToken, user.email)
+    logging.info('calendar events %s', events)
     if (user is not None):
         login_user(user, remember=True)
         try:
-            response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON()})
-            # response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar':events})
+            response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar':events})
         except Exception as e:
             logging.info('error %s', e)
 
@@ -51,13 +50,21 @@ def login():
 
 @app.route('/cookielogin', methods=["POST"])
 def cookielogin():
+    logging.info("start cookie login")
+
     token = request.get_json().get("jwt")
-    logging.info("getting encoded token %s type %s in cookielogin function", token, type(token))
-    user = gs.token_Login(token)
+    decoded =  read_token(token)
+    user = gs.token_Login(decoded.get('id'))
+
+    accessToken = decoded.get('accessToken')
+    email = decoded.get('email')
+    events = gc.get_events(accessToken, email)
+    # formatted_events = gc.parse_events(events)
+    logging.info('calendar events %s', type(events))
 
     if (user is not None):
         login_user(user, remember=True)
-        response = jsonify({"ok": True, "token": user.get_token().decode('utf-8'), 'user':user.toJSON()})
+        response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar': events})
         logging.info("user cookie loggedin %s", user.id)
     else:
         response = jsonify({"ok": False, "token": "", 'user':None})
@@ -65,14 +72,14 @@ def cookielogin():
     return response
 
 
-@app.route('/calendar', methods=["GET"])
-def get_calendar():
-    print("calendar here")
-    token = request.get_json().get("jwt")
-    user = gs.token_Login(token)
-
-    # if (user is not None):
-    #     continue
+# @app.route('/calendar', methods=["GET"])
+# def get_calendar():
+#     print("calendar here")
+#     token = request.get_json().get("jwt")
+#     user = gs.token_Login(token)
+#
+#     # if (user is not None):
+#     #     continue
 
 
 @app.errorhandler(404)
