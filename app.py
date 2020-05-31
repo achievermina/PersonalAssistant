@@ -38,7 +38,7 @@ def login():
     if (user is not None):
         login_user(user, remember=True)
         try:
-            response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar':events})
+            response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar':json.loads(events)})
         except Exception as e:
             logging.info('error %s', e)
 
@@ -63,7 +63,7 @@ def cookielogin():
 
     if (user is not None):
         login_user(user, remember=True)
-        response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar': events})
+        response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar': json.loads(events)})
         logging.info("user cookie loggedin %s", user.id)
     else:
         response = jsonify({"ok": False, "token": "", 'user':None})
