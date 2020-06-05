@@ -13,8 +13,7 @@ def get_calandarId(access_token):
 
     return response
 
-
-def get_events(access_token,calendarId):
+def get_events(access_token, calendarId):
     logging.info('start getting calendar events %s %s', calendarId, access_token)
     today = datetime.utcnow()
     enddate = today + timedelta(days=7)
@@ -33,3 +32,30 @@ def get_events(access_token,calendarId):
     )
     logging.info('calendar response %s %s', response.status_code, response.text)
     return response.text
+
+def add_event(access_token, calendarId, event):
+    # event has start, end, title
+    start = {
+        "dateTime": event.starDateTime,
+        "timeZone": event.timezone
+    }
+    end = {
+        "dateTime": event.endDateTime,
+        "timeZone": event.timezone
+    }
+    eventBody = {
+        'start': start,
+        'end': end,
+        'summary': event.title,
+    }
+
+    headers = {'Authorization': f'Bearer {access_token}'}
+    response = requests.post(
+        'https://www.googleapis.com/calendar/v3/calendars/' + calendarId + '/events',
+        headers= headers,
+        body= eventBody
+    )
+    logging.info('calendar response %s %s', response.status_code, response.text)
+
+
+
