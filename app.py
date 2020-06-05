@@ -83,7 +83,7 @@ def search():
     searchTerm = request.get_json()['term']
     logging.fatal("Start service search term: %s", searchTerm)
     try:
-      channel = grpc.insecure_channel('0.0.0.0:50051')
+      channel = grpc.insecure_channel('ec2-3-15-225-152.us-east-2.compute.amazonaws.com:8080')
       stub = indeedclone_pb2_grpc.jobServiceStub(channel)
       response = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
       logging.fatal(response)
