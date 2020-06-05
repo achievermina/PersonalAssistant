@@ -11,6 +11,7 @@ from flask import Flask, request
 from flask_login import LoginManager, login_user
 import grpc
 from gRPC import indeedclone_pb2, indeedclone_pb2_grpc
+from google.protobuf.json_format import MessageToDict, MessageToJson
 
 SECRET_KEY = 'development key'
 app = Flask(__name__)
@@ -85,9 +86,10 @@ def search():
     try:
       channel = grpc.insecure_channel('ec2-3-15-225-152.us-east-2.compute.amazonaws.com:8080')
       stub = indeedclone_pb2_grpc.jobServiceStub(channel)
-      response = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
-      logging.fatal(response)
-
+      res = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
+      jobList = MessageToDict(res)
+      # logging.fatal(jobList, type(jobList))
+      response = jsonify({"ok": True, 'jobList': jobList})
       return response
 
     except Exception as e:
