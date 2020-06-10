@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  app:
+    image: flask-personalassistant-app:$TAG  # 현재 로컬 도커에 빌드가 되어 있어서 ecs-cli push nginx  만 해도 알아서 올라
+    build: .
+
+  nginx:
+    image: nginx:$TAG  #nginx 는 프로그램이름  -- > 역할은 proxy
+    build: ./nginx
+
+
+# 1. build 파일로 새로운 도커 이미지를 빌드하고
+#  2.ECR 에 올림 -> 도커이미지를 받을수 있는 곳이 생긴
+#  3.ECR에서 URI 가 나오는데
+#  4. 그걸 프로트 도커져옴 컴포스 파일에 넣어줘야
+# 5. 도커이미지 다운받아서 컴포즈 업 할때 그 이미지 파일 가
