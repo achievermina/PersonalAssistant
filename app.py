@@ -1,6 +1,4 @@
-import sys
-
-from DataBase.dynamoDB import Database
+import sys, os
 from API.User import User, read_token
 import API.googleSignIn  as gs
 import API.googleCalendar  as gc
@@ -11,7 +9,12 @@ from flask import Flask, request
 from flask_login import LoginManager, login_user
 import grpc
 from gRPC import indeedclone_pb2, indeedclone_pb2_grpc
-from google.protobuf.json_format import MessageToDict, MessageToJson
+from google.protobuf.json_format import MessageToDict
+from dotenv import load_dotenv
+
+load_dotenv()
+INDEEDCLONE_ENDPOINT = os.getenv("INDEEDCLONE_ENDPOINT")
+
 
 SECRET_KEY = 'development key'
 app = Flask(__name__)
@@ -28,18 +31,18 @@ def load_user(user_id):
     logging.info('user get done')
     return User.get(user_id)
 
-@app.route('/login', methods=["POST"])
+@app.route('/login', methods=["POST"])  ##exchange token
 @cross_origin()
 def login():
-    googleToken = request.get_json().get("googleToken")
-    accessToken = request.get_json().get("accessToken")
-    user = gs.google_token_verification(googleToken, accessToken)
-    events = gc.get_events(accessToken, user.email)
+    google_exchange_token = request.get_json().get("googleExchangeToken")
+    google_access_token = request.get_json().get("googleAccessToken")
+    user = gs.google_token_verification(google_exchange_token, google_access_token)
+    events = gc.get_events(google_access_token, user.email)
     logging.info('calendar events %s', events)
     if (user is not None):
         login_user(user, remember=True)
         try:
-            response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar':json.loads(events)})
+            response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.user_to_JSON(), 'calendar':json.loads(events)})
         except Exception as e:
             logging.info('error %s', e)
 
@@ -57,14 +60,14 @@ def cookielogin():
     decoded =  read_token(token)
     user = gs.token_Login(decoded.get('id'))
 
-    accessToken = decoded.get('accessToken')
+    google_access_token = decoded.get('google_access_token')
     email = decoded.get('email')
-    events = gc.get_events(accessToken, email)
+    events = gc.get_events(google_access_token, email)
     logging.info('calendar events %s', type(events))
 
     if (user is not None):
         login_user(user, remember=True)
-        response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.toJSON(),'calendar': json.loads(events)})
+        response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.user_to_JSON(), 'calendar': json.loads(events)})
         logging.info("user cookie loggedin %s", user.id)
     else:
         response = jsonify({"ok": False, "token": "", 'user':None})
@@ -84,29 +87,16 @@ def search():
     searchTerm = request.get_json()['term']
     logging.fatal("Start service search term: %s", searchTerm)
     try:
-      channel = grpc.insecure_channel('ec2-3-15-225-152.us-east-2.compute.amazonaws.com:8080')
+      channel = grpc.insecure_channel(INDEEDCLONE_ENDPOINT)
       stub = indeedclone_pb2_grpc.jobServiceStub(channel)
       res = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
       jobList = MessageToDict(res)
-      # logging.fatal(jobList, type(jobList))
       response = jsonify({"ok": True, 'jobList': jobList})
       return response
 
     except Exception as e:
       print(e)
       return e
-
-
-@app.route('/test-items')
-def test_items():
-    db = Database()
-    return '''<h2>db.test_db()</h2>'''
-
-
-@app.route('/add', methods=['POST'])
-def add():
-    data = request.get_json()
-    return jsonify({'sum': int(data['a']) + int(data['b'])})
 
 if __name__ == "__main__":
     logging.getLogger('flask_cors').level = logging.DEBUG

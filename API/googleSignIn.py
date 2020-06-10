@@ -18,7 +18,7 @@ def google_token_verification(idToken, accessToken):
             raise ValueError('Wrong issuer.')
         user_id = idinfo['sub']
         logging.info("idToken in google %s", user_id)
-        logging.info("accessToken in google %s", accessToken)
+        logging.info("google_access_token in google %s", accessToken)
         # logging.info("idinfo in google %s", idinfo)
     except ValueError:
         return
@@ -28,11 +28,11 @@ def google_token_verification(idToken, accessToken):
     if user is None:
         newUser = {
             "id":  idinfo["sub"],
-            "accessToken": accessToken,
+            "google_access_token": accessToken,
             "email": idinfo["email"],
             "name": idinfo["name"],
             "expires_at": idinfo["exp"],
-            "authenticated": idinfo["email_verified"]
+            "email_verified": idinfo["email_verified"]
         }
         if add_user_to_database(newUser):
             user = User.get(user_id)

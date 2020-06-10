@@ -3,7 +3,7 @@ import requests
 import logging
 from datetime import datetime, timezone, timedelta
 
-def get_calandarId(access_token):
+def get_calendar_id(access_token):
     headers = {'Authorization': f'Bearer {access_token}'}
     response = requests.get(
         'https://www.googleapis.com/calendar/v3/users/me/calendarList',
@@ -30,7 +30,7 @@ def get_events(access_token, calendarId):
                    'maxResults':10,
                    }
     )
-    logging.info('calendar response %s %s', response.status_code, response.text)
+    #logging.info('calendar response %s %s', response.status_code, response.text)
     return response.text
 
 def add_event(access_token, calendarId, event):
@@ -43,7 +43,7 @@ def add_event(access_token, calendarId, event):
         "dateTime": event.endDateTime,
         "timeZone": event.timezone
     }
-    eventBody = {
+    event_body = {
         'start': start,
         'end': end,
         'summary': event.title,
@@ -53,7 +53,7 @@ def add_event(access_token, calendarId, event):
     response = requests.post(
         'https://www.googleapis.com/calendar/v3/calendars/' + calendarId + '/events',
         headers= headers,
-        body= eventBody
+        body= event_body
     )
     logging.info('calendar response %s %s', response.status_code, response.text)
 
