@@ -1,7 +1,6 @@
 from flask_login import UserMixin
 from DataBase.dynamoDB import Database
-import jwt, logging, json
-import os
+import jwt, logging, json, os
 from dotenv import load_dotenv
 
 load_dotenv()

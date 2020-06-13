@@ -15,7 +15,6 @@ from dotenv import load_dotenv
 load_dotenv()
 INDEEDCLONE_ENDPOINT = os.getenv("INDEEDCLONE_ENDPOINT")
 
-
 SECRET_KEY = 'development key'
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -74,29 +73,54 @@ def cookielogin():
 
     return response
 
+
+@app.route('/addevent', methods=["POST"])
+def add_calendar_event():
+    logging.info("Adding calendar event")
+
+    token = request.get_json().get("jwt")
+    decoded = jwt.decode(token, JWT_SECRET, 'HS256')
+    google_access_token = decoded.get('google_access_token')
+    email = decoded.get('email')
+    print("%s %s", token, email)
+
+    # google_access_token = request.get_json().get("token")
+    # email = request.get_json().get("email")
+    # event = request.get_json().get("event")
+    # print("%s ", event)
+
+    success = gc.add_event(google_access_token, email, event)
+    if success is True:
+        events = gc.get_events(google_access_token, email)
+        response = jsonify({"ok": True, 'calendar': json.loads(events)})
+    else:
+        response = jsonify({"ok": False})
+    return response
+
+
+@app.route('/indeedclone', methods=["POST"])
+def search():
+    searchTerm = request.get_json()['term']
+    logging.fatal("Start service search term: %s", searchTerm)
+    try:
+        channel = grpc.insecure_channel(INDEEDCLONE_ENDPOINT)
+        stub = indeedclone_pb2_grpc.jobServiceStub(channel)
+        res = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
+        jobList = MessageToDict(res)
+        response = jsonify({"ok": True, 'jobList': jobList})
+        return response
+
+    except Exception as e:
+        print(e)
+        return e
+
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 @app.route('/')
 def main():
-    return '''<h2>hi</h2>'''
-
-@app.route('/indeedclone',methods=["POST"])
-def search():
-    searchTerm = request.get_json()['term']
-    logging.fatal("Start service search term: %s", searchTerm)
-    try:
-      channel = grpc.insecure_channel(INDEEDCLONE_ENDPOINT)
-      stub = indeedclone_pb2_grpc.jobServiceStub(channel)
-      res = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
-      jobList = MessageToDict(res)
-      response = jsonify({"ok": True, 'jobList': jobList})
-      return response
-
-    except Exception as e:
-      print(e)
-      return e
+    return '''<h2>hi Personal Assistant - bakend</h2>'''
 
 if __name__ == "__main__":
     logging.getLogger('flask_cors').level = logging.DEBUG

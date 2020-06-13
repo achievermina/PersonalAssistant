@@ -36,26 +36,31 @@ def get_events(access_token, calendarId):
 def add_event(access_token, calendarId, event):
     # event has start, end, title
     start = {
-        "dateTime": event.starDateTime,
-        "timeZone": event.timezone
+        "dateTime": event['start_date_time'],
+        "timeZone": event['timezone']
     }
     end = {
-        "dateTime": event.endDateTime,
-        "timeZone": event.timezone
+        "dateTime": event['end_date_time'],
+        "timeZone": event['timezone']
     }
     event_body = {
         'start': start,
         'end': end,
-        'summary': event.title,
+        'summary': event['title'],
     }
+    try:
+        headers = {'Authorization': f'Bearer {access_token}'}
+        response = requests.post(
+            'https://www.googleapis.com/calendar/v3/calendars/' + calendarId + '/events',
+            headers=headers,
+            body=event_body
+        )
+        logging.info('Success: calendar added response %s', response.status_code)
+        return True
 
-    headers = {'Authorization': f'Bearer {access_token}'}
-    response = requests.post(
-        'https://www.googleapis.com/calendar/v3/calendars/' + calendarId + '/events',
-        headers= headers,
-        body= event_body
-    )
-    logging.info('calendar response %s %s', response.status_code, response.text)
+    except Exception as e:
+        logging.info("Failed: unable to add a calendar", e)
+        return False
 
 
 
