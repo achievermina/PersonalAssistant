@@ -120,7 +120,7 @@ def not_found(error):
 
 @app.route('/')
 def main():
-    return '''<h2>hi Personal Assistant - bakend</h2>'''
+    return '''<h2>hi Personal Assistant - Backend</h2>'''
 
 if __name__ == "__main__":
     logging.getLogger('flask_cors').level = logging.DEBUG

@@ -36,19 +36,22 @@ def google_token_verification(idToken, accessToken):
         }
         if add_user_to_database(newUser):
             user = User.get(user_id)
-            logging.info("database user added : %s, id type %s", user.get_id(), type(user_id) )
+            logging.error("database user added : %s, id type %s", user.get_id(), type(user_id) )
         else:
+            logging.error("database user adding failed")
             return
     return user
 
 def add_user_to_database(user):
     try:
         db = Database()
+        logging.error("db %s", db)
+
         db.add_item("user-info", user)
-        logging.info("Success: adding a new user to DB")
+        logging.error("Success: adding a new user to DB")
         return True
     except Exception as e:
-        logging.info("Adding email: ", user['email'], " failed" , "error", e)
+        logging.error("Adding email: ", user['email'], " failed" , "error", e)
 
     return False
 

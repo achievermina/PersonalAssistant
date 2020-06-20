@@ -8,7 +8,7 @@ DYNAMODB_ENDPOINT = os.getenv("DYNAMODB_ENDPOINT")
 
 class Database:
     def __init__(self):
-        self.dynamo_client = boto3.resource('dynamodb', endpoint_url=DYNAMODB_ENDPOINT)
+        self.dynamo_client = boto3.resource('dynamodb')
 
     def add_item(self, table_name, col_dict):
         table = self.dynamo_client.Table(table_name)
@@ -25,28 +25,28 @@ class Database:
             logging.info("Error: reading a user in the database %s", err)
             return None
 
-    def create_table(self, table_name):
-        table = self.dynamo_client.create_table(
-            TableName= table_name,
-            KeySchema=[
-                {
-                    'AttributeName': 'id',
-                    'KeyType': 'HASH'  # Partition key
-                }
-            ],
-            AttributeDefinitions=[
-                {
-                    'AttributeName': 'id',
-                    'AttributeType': 'S'
-                }
-            ],
-            ProvisionedThroughput={
-                'ReadCapacityUnits': 10,
-                'WriteCapacityUnits': 10
-            }
-        )
-
-        print("Table status:", table.table_status)
+    # def create_table(self, table_name):
+    #     table = self.dynamo_client.create_table(
+    #         TableName= table_name,
+    #         KeySchema=[
+    #             {
+    #                 'AttributeName': 'id',
+    #                 'KeyType': 'HASH'  # Partition key
+    #             }
+    #         ],
+    #         AttributeDefinitions=[
+    #             {
+    #                 'AttributeName': 'id',
+    #                 'AttributeType': 'S'
+    #             }
+    #         ],
+    #         ProvisionedThroughput={
+    #             'ReadCapacityUnits': 10,
+    #             'WriteCapacityUnits': 10
+    #         }
+    #     )
+    #
+    #     print("Table status:", table.table_status)
 
 if __name__ == '__main__':
     db = Database()
