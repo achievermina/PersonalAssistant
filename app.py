@@ -11,9 +11,28 @@ import grpc
 from gRPC import indeedclone_pb2, indeedclone_pb2_grpc
 from google.protobuf.json_format import MessageToDict
 from dotenv import load_dotenv
+from logging.config import dictConfig
+
 
 load_dotenv()
 INDEEDCLONE_ENDPOINT = os.getenv("INDEEDCLONE_ENDPOINT")
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://sys.stdout',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
+
 
 SECRET_KEY = 'development key'
 app = Flask(__name__)
@@ -37,13 +56,13 @@ def login():
     google_access_token = request.get_json().get("googleAccessToken")
     user = gs.google_token_verification(google_exchange_token, google_access_token)
     events = gc.get_events(google_access_token, user.email)
-    logging.info('calendar events %s', events)
+    app.logger.info('calendar events %s', events)
     if (user is not None):
         login_user(user, remember=True)
         try:
             response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.user_to_JSON(), 'calendar':json.loads(events)})
         except Exception as e:
-            logging.info('error %s', e)
+            app.logger.info('error %s', e)
 
     else:
         response = jsonify({"ok": False, "error": "cannot login or signup"})
@@ -62,12 +81,12 @@ def cookielogin():
     google_access_token = decoded.get('google_access_token')
     email = decoded.get('email')
     events = gc.get_events(google_access_token, email)
-    logging.info('calendar events %s', type(events))
+    app.logger.info('calendar events %s', type(events))
 
     if (user is not None):
         login_user(user, remember=True)
         response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.user_to_JSON(), 'calendar': json.loads(events)})
-        logging.info("user cookie loggedin %s", user.id)
+        app.logger.info("user cookie loggedin %s", user.id)
     else:
         response = jsonify({"ok": False, "token": "", 'user':None})
 
