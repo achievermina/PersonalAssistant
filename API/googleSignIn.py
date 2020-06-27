@@ -32,7 +32,8 @@ def google_token_verification(idToken, accessToken):
             "email": idinfo["email"],
             "name": idinfo["name"],
             "expires_at": idinfo["exp"],
-            "email_verified": idinfo["email_verified"]
+            "email_verified": idinfo["email_verified"],
+            "google_calendar_next_sync_token": None
         }
         if add_user_to_database(newUser):
             user = User.get(user_id)
