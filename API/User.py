@@ -1,7 +1,6 @@
 from flask_login import UserMixin
 from DataBase.dynamoDB import Database
-import jwt, logging, json
-import os
+import jwt, logging, json, os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,7 +17,7 @@ class User(UserMixin):
 
     @staticmethod
     def get(user_id):
-        logging.info("getting user from the database %s", user_id )
+        logging.error("getting user from the database %s", user_id )
         try:
             db = Database()
             user =  db.read_item("user-info", user_id)

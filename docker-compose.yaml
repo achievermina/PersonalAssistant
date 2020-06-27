@@ -13,15 +13,15 @@ services:
       - .:/app
     environment:
       PYTHONBUFFERED: 1
-      AWS_ACCESS_KEY_ID: "id"
-      AWS_SECRET_ACCESS_KEY: "key"
-      AWS_DEFAULT_REGION: "us-east-1"
-    entrypoint:
-      python
-    command: [
-#      "python",
-      "app.py"
-    ]
+      AWS_ACCESS_KEY_ID: "AKIA2MF72JKZZBHRSKXJ"
+      AWS_SECRET_ACCESS_KEY: "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"
+      AWS_DEFAULT_REGION: "us-east-2"
+    command: gunicorn app:app -w 2 --threads 2 -b 0.0.0.0:5000
+#    entrypoint:
+#      python
+#    command: [
+#      "app.py"
+#    ]
 
   nginx:
     image: nginx  #nginx 는 프로그램이름  -- > 역할은 proxy

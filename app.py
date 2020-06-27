@@ -11,9 +11,27 @@ import grpc
 from gRPC import indeedclone_pb2, indeedclone_pb2_grpc
 from google.protobuf.json_format import MessageToDict
 from dotenv import load_dotenv
+from logging.config import dictConfig
+
 
 load_dotenv()
 INDEEDCLONE_ENDPOINT = os.getenv("INDEEDCLONE_ENDPOINT")
+
+dictConfig({
+    'version': 1,
+    'formatters': {'default': {
+        'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
+    }},
+    'handlers': {'wsgi': {
+        'class': 'logging.StreamHandler',
+        'stream': 'ext://sys.stdout',
+        'formatter': 'default'
+    }},
+    'root': {
+        'level': 'INFO',
+        'handlers': ['wsgi']
+    }
+})
 
 
 SECRET_KEY = 'development key'
@@ -38,13 +56,13 @@ def login():
     google_access_token = request.get_json().get("googleAccessToken")
     user = gs.google_token_verification(google_exchange_token, google_access_token)
     events = gc.get_events(google_access_token, user.email)
-    logging.info('calendar events %s', events)
+    app.logger.info('calendar events %s', events)
     if (user is not None):
         login_user(user, remember=True)
         try:
             response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.user_to_JSON(), 'calendar':json.loads(events)})
         except Exception as e:
-            logging.info('error %s', e)
+            app.logger.info('error %s', e)
 
     else:
         response = jsonify({"ok": False, "error": "cannot login or signup"})
@@ -63,16 +81,57 @@ def cookielogin():
     google_access_token = decoded.get('google_access_token')
     email = decoded.get('email')
     events = gc.get_events(google_access_token, email)
-    logging.info('calendar events %s', type(events))
+    app.logger.info('calendar events %s', type(events))
 
     if (user is not None):
         login_user(user, remember=True)
         response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.user_to_JSON(), 'calendar': json.loads(events)})
-        logging.info("user cookie loggedin %s", user.id)
+        app.logger.info("user cookie loggedin %s", user.id)
     else:
         response = jsonify({"ok": False, "token": "", 'user':None})
 
     return response
+
+
+@app.route('/addevent', methods=["POST"])
+def add_calendar_event():
+    logging.info("Adding calendar event")
+
+    token = request.get_json().get("jwt")
+    decoded = jwt.decode(token, JWT_SECRET, 'HS256')
+    google_access_token = decoded.get('google_access_token')
+    email = decoded.get('email')
+    print("%s %s", token, email)
+
+    # google_access_token = request.get_json().get("token")
+    # email = request.get_json().get("email")
+    # event = request.get_json().get("event")
+    # print("%s ", event)
+
+    success = gc.add_event(google_access_token, email, event)
+    if success is True:
+        events = gc.get_events(google_access_token, email)
+        response = jsonify({"ok": True, 'calendar': json.loads(events)})
+    else:
+        response = jsonify({"ok": False})
+    return response
+
+
+@app.route('/indeedclone', methods=["POST"])
+def search():
+    searchTerm = request.get_json()['term']
+    logging.fatal("Start service search term: %s", searchTerm)
+    try:
+        channel = grpc.insecure_channel(INDEEDCLONE_ENDPOINT)
+        stub = indeedclone_pb2_grpc.jobServiceStub(channel)
+        res = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
+        jobList = MessageToDict(res)
+        response = jsonify({"ok": True, 'jobList': jobList})
+        return response
+
+    except Exception as e:
+        print(e)
+        return e
 
 @app.errorhandler(404)
 def not_found(error):
@@ -80,23 +139,7 @@ def not_found(error):
 
 @app.route('/')
 def main():
-    return '''<h2>hi</h2>'''
-
-@app.route('/indeedclone',methods=["POST"])
-def search():
-    searchTerm = request.get_json()['term']
-    logging.fatal("Start service search term: %s", searchTerm)
-    try:
-      channel = grpc.insecure_channel(INDEEDCLONE_ENDPOINT)
-      stub = indeedclone_pb2_grpc.jobServiceStub(channel)
-      res = stub.Search(indeedclone_pb2.searchRequest(term=searchTerm))
-      jobList = MessageToDict(res)
-      response = jsonify({"ok": True, 'jobList': jobList})
-      return response
-
-    except Exception as e:
-      print(e)
-      return e
+    return '''<h2>hi Personal Assistant - Backend</h2>'''
 
 if __name__ == "__main__":
     logging.getLogger('flask_cors').level = logging.DEBUG
