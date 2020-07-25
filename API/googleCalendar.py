@@ -1,10 +1,6 @@
-
 import requests
 import logging
 from datetime import datetime, timezone, timedelta
-
-from googleapiclient.errors import HttpError
-
 
 def get_calendar_id(access_token):
     headers = {'Authorization': f'Bearer {access_token}'}

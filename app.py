@@ -56,7 +56,6 @@ def login():
     google_access_token = request.get_json().get("googleAccessToken")
     user = gs.google_token_verification(google_exchange_token, google_access_token)
     events = gc.get_events(google_access_token, user.email)
-    # app.logger.info('calendar events type %s', type(events))
     if (user is not None):
         login_user(user, remember=True)
         events_in_json = json.loads(events)
@@ -83,19 +82,7 @@ def cookielogin():
 
     if (user is not None):
         login_user(user, remember=True)
-
-        google_access_token = user.google_access_token
-        email= user.email
-        google_next_sync_token = user.google_calendar_next_sync_token
-
-        events = gc.get_events(google_access_token, email, google_next_sync_token)
-        events_in_json = json.loads(events)
-        logging.info('calendar events %s ', events_in_json['error'])
-
-        if events_in_json['error'] is None:
-            user.save_next_sync_token(events_in_json['nextSyncToken'])
-
-        response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.user_to_JSON(), 'calendar': events_in_json})
+        response = jsonify({"ok": True, 'token': user.get_token().decode('utf-8'), 'user':user.user_to_JSON()})
         app.logger.info("user cookie loggedin %s", user.id)
     else:
         response = jsonify({"ok": False, "token": "", 'user':None})
