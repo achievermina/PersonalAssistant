@@ -13,7 +13,6 @@ from google.protobuf.json_format import MessageToDict
 from dotenv import load_dotenv
 from logging.config import dictConfig
 
-
 load_dotenv()
 INDEEDCLONE_ENDPOINT = os.getenv("INDEEDCLONE_ENDPOINT")
 
@@ -33,7 +32,6 @@ dictConfig({
     }
 })
 
-
 SECRET_KEY = 'development key'
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -49,7 +47,7 @@ def load_user(user_id):
     logging.info('user get done')
     return User.get(user_id)
 
-@app.route('/login', methods=["POST"])  ##exchange token
+@app.route('/login', methods=["POST"])
 @cross_origin()
 def login():
     google_exchange_token = request.get_json().get("googleExchangeToken")
@@ -89,31 +87,6 @@ def cookielogin():
 
     return response
 
-
-@app.route('/addevent', methods=["POST"])
-def add_calendar_event():
-    logging.info("Adding calendar event")
-
-    token = request.get_json().get("jwt")
-    decoded = jwt.decode(token, JWT_SECRET, 'HS256')
-    google_access_token = decoded.get('google_access_token')
-    email = decoded.get('email')
-    print("%s %s", token, email)
-
-    # google_access_token = request.get_json().get("token")
-    # email = request.get_json().get("email")
-    # event = request.get_json().get("event")
-    # print("%s ", event)
-
-    success = gc.add_event(google_access_token, email, event)
-    if success is True:
-        events = gc.get_events(google_access_token, email)
-        response = jsonify({"ok": True, 'calendar': json.loads(events)})
-    else:
-        response = jsonify({"ok": False})
-    return response
-
-
 @app.route('/indeedclone', methods=["POST"])
 def search():
     searchTerm = request.get_json()['term']
@@ -131,7 +104,7 @@ def search():
         return e
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found():
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 @app.route('/')
@@ -146,4 +119,3 @@ if __name__ == "__main__":
     handler.setLevel(logging.INFO)
 
     app.run(host='0.0.0.0', debug=True)
-

@@ -17,19 +17,13 @@ services:
       AWS_SECRET_ACCESS_KEY: "TJXSzaTDfwh3VencWAAZDCkKzZpvqlAa/otvFZlx"
       AWS_DEFAULT_REGION: "us-east-2"
     command: gunicorn app:app -w 2 --threads 2 -b 0.0.0.0:5000
-#    entrypoint:
-#      python
-#    command: [
-#      "app.py"
-#    ]
 
   nginx:
-    image: nginx  #nginx 는 프로그램이름  -- > 역할은 proxy
+    image: nginx
     build: ./nginx
     ports:
       - "80:80"
     command: /bin/bash -c "sleep 10; exec nginx -g 'daemon off;'"
-
 
   dynamodb:
     image: amazon/dynamodb-local
@@ -39,7 +33,7 @@ services:
       - dynamodb_data:/home/dynamodblocal/data
     ports:
       - "8000"
-# 8042 local 접속  # 오른쪽은 컨테이너에서 접속하는 포트
+
   initializer:
     image: amazon/aws-cli
     volumes:
@@ -50,53 +44,3 @@ services:
       AWS_ACCESS_KEY_ID: "id"
       AWS_SECRET_ACCESS_KEY: "key"
       AWS_DEFAULT_REGION: "us-east-1"
-
-#    command: "aws dynamodb --endpoint-url http://localhost:8042 create-table --table-name user-info --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5"
-
-#### create database
-
-#docker-compose -f docker-compose.yaml up
-# -d: demon --> background 에서 돌리는것
-###  로그가 안보임
-###  죽으나 사나 모름
-
-##### 도커에 올리면 도커내부의 로컬호스트는 외부에서의 로컬호스트로 접속이 안됨
-#docker inspect #세션 아이디를 써서 현재 도커의 hostname을 찾아야함
-
-
-###create table in docker
-#docker exec -it personalassistant_app_1 /bin/bash -c 'aws dynamodb --endpoint-url http://host.docker.internal:8042 create-table --table-name user-info --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5'
-
-
-
-
-
-
-## Shell Script
-
-
-#  create Table
-
-#  aws dynamodb --endpoint-url http://localhost:8042 create-table --table-name user-info \
-#  --attribute-definitions AttributeName=id,AttributeType=S --key-schema AttributeName=id,KeyType=HASH \
-#  --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
-
-
-# ADD ITEM
-
-# aws dynamodb put-item --endpoint-url http://localhost:8042 --table-name user-info \
-#   --item '{"id": {"S": "1111"}, "email": {"S": "email@something.com"}}'
-
-
-# GET ITEM
-
-#aws dynamodb get-item --endpoint-url http://localhost:8042 --table-name user-info \
-#  --key '{"id": {"S": "1111"}}'
-
-## Update Item
-
-##aws dynamodb update-item --endpoint-url http://localhost:8042 --table-name demo-customer-info \
-##  --key '{"customerId": {"S": "1111"}}' \
-##  --update-expression 'SET #email = :newEmail' \
-##  --expression-attribute-names '{"#email": "email"}' \
-##  --expression-attribute-values '{":newEmail": {"S": "newemail@somethingnew.com"}}'

@@ -14,8 +14,3 @@ COPY . /app
 
 EXPOSE 5000
 ENTRYPOINT []
-#Settings/gunicorn_starter.sh
-# entry point를 override 한뒤에 command 에 사용
-
-#ENTRYPOINT "python"
-#CMD [ "app.py"]

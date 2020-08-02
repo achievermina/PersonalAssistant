@@ -39,28 +39,29 @@ class Database:
         )
 
         return response
-    # def create_table(self, table_name):
-    #     table = self.dynamo_client.create_table(
-    #         TableName= table_name,
-    #         KeySchema=[
-    #             {
-    #                 'AttributeName': 'id',
-    #                 'KeyType': 'HASH'  # Partition key
-    #             }
-    #         ],
-    #         AttributeDefinitions=[
-    #             {
-    #                 'AttributeName': 'id',
-    #                 'AttributeType': 'S'
-    #             }
-    #         ],
-    #         ProvisionedThroughput={
-    #             'ReadCapacityUnits': 10,
-    #             'WriteCapacityUnits': 10
-    #         }
-    #     )
-    #
-    #     print("Table status:", table.table_status)
+
+    def create_table(self, table_name):
+        table = self.dynamo_client.create_table(
+            TableName= table_name,
+            KeySchema=[
+                {
+                    'AttributeName': 'id',
+                    'KeyType': 'HASH'  # Partition key
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': 'id',
+                    'AttributeType': 'S'
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 10,
+                'WriteCapacityUnits': 10
+            }
+        )
+
+        print("Table status:", table.table_status)
 
 if __name__ == '__main__':
     db = Database()

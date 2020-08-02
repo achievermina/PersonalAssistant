@@ -7,7 +7,8 @@ load_dotenv()
 JWT_SECRET = os.getenv("JWT_SECRET")
 
 class User(UserMixin):
-    def __init__(self, user_id, email=None, name=None, email_verified=False, google_access_token=None, google_calendar_next_sync_token = None):
+    def __init__(self, user_id, email=None, name=None, email_verified=False,
+                 google_access_token=None, google_calendar_next_sync_token = None):
         self.id = user_id
         self.email = email
         self.name = name
@@ -25,17 +26,20 @@ class User(UserMixin):
             if user is None:
                 logging.error("getting user from the database is NONE")
                 return None
-            current_user = User(user['id'], user['email'], user['name'], user['email_verified'], user['google_access_token'], user['google_calendar_next_sync_token'])
+            current_user = User(user['id'], user['email'], user['name'], user['email_verified'],
+                                user['google_access_token'], user['google_calendar_next_sync_token'])
             return current_user
 
         except:
             return None
 
     def save_next_sync_token(self, user_google_calendar_next_sync_token):
-        logging.info("Saving user google calendar next sync token to the database %s", user_google_calendar_next_sync_token)
+        logging.info("Saving user google calendar next sync token to the database %s",
+                     user_google_calendar_next_sync_token)
         try:
             db = Database()
-            db.update_item("user-info", self.id, "google_calendar_next_sync_token", user_google_calendar_next_sync_token)
+            db.update_item("user-info", self.id, "google_calendar_next_sync_token",
+                           user_google_calendar_next_sync_token)
             return True
         except:
             return False
@@ -53,9 +57,10 @@ class User(UserMixin):
         return self.email_verified
 
     def get_token(self):
-        logging.info("JWT_SECRET %s, type %s", JWT_SECRET,type(JWT_SECRET))
-
-        encoded = jwt.encode({'id': self.id, 'email': self.email, 'google_access_token': self.google_access_token, 'google_calendar_next_sync_token': self.google_calendar_next_sync_token}, JWT_SECRET, algorithm='HS256')
+        encoded = jwt.encode({'id': self.id, 'email': self.email, 'google_access_token': self.google_access_token,
+                              'google_calendar_next_sync_token': self.google_calendar_next_sync_token},
+                             JWT_SECRET,
+                             algorithm='HS256')
         logging.info("encode type %s", type(encoded))
         return encoded
 

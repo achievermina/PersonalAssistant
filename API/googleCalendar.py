@@ -1,6 +1,6 @@
 import requests
 import logging
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 
 def get_calendar_id(access_token):
     headers = {'Authorization': f'Bearer {access_token}'}
@@ -18,7 +18,7 @@ def get_events(access_token, calendarId, next_sync_token=None, cnt = 0):
     enddate = today + timedelta(days=7)
     formatted_startdate = today.isoformat("T") + "Z"
     formatted_enddate = enddate.isoformat("T") + "Z"
-    logging.info('start date, end date %s %s %s %s', formatted_startdate, formatted_enddate, type(formatted_startdate), type(formatted_enddate))
+    logging.info('start date, end date %s %s', formatted_startdate, formatted_enddate)
 
     if next_sync_token is None:  #full sync
         request_params = {
@@ -44,12 +44,9 @@ def get_events(access_token, calendarId, next_sync_token=None, cnt = 0):
         get_events(access_token, calendarId, None, 1)
 
     logging.info('outside error %s %s', response.status_code, response)
-
-    # logging.info('calendar response %s %s', response.status_code, response)
     return response.text
 
 def add_event(access_token, calendarId, event):
-    # event has start, end, title
     start = {
         "dateTime": event['start_date_time'],
         "timeZone": event['timezone']
@@ -63,6 +60,7 @@ def add_event(access_token, calendarId, event):
         'end': end,
         'summary': event['title'],
     }
+
     try:
         headers = {'Authorization': f'Bearer {access_token}'}
         response = requests.post(
@@ -76,6 +74,3 @@ def add_event(access_token, calendarId, event):
     except Exception as e:
         logging.info("Failed: unable to add a calendar", e)
         return False
-
-
-
