@@ -13,8 +13,8 @@ services:
       - .:/app
     environment:
       PYTHONBUFFERED: 1
-      AWS_ACCESS_KEY_ID: "AKIA2MF72JKZZBHRSKXJ"
-      AWS_SECRET_ACCESS_KEY: "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"
+      AWS_ACCESS_KEY_ID: "AWS_ACCESS_KEY_ID"
+      AWS_SECRET_ACCESS_KEY: "AWS_SECRET_ACCESS_KEY"
       AWS_DEFAULT_REGION: "us-east-2"
     command: gunicorn app:app -w 2 --threads 2 -b 0.0.0.0:5000
 
