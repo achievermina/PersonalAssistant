@@ -109,3 +109,13 @@ def not_found():
 @app.route('/')
 def main():
     return '''<h2>hi Personal Assistant - Backend</h2>'''
+
+if __name__ == "__main__":
+    logging.getLogger('flask_cors').level = logging.DEBUG
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setLevel(logging.INFO)
+
+    app.run(host='0.0.0.0', debug=True)
+
