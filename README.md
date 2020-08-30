@@ -6,7 +6,11 @@ The web application is customized assistant for schedule management, job search 
 Using three different micro services with different programming languages, explore different functionalities.
 * [Frontend Repo](https://github.com/achievermina/PersonalAssistant-Frontend)
 * [Indeed Webscrapping](https://github.com/achievermina/IndeedWebScrapping-API)
-	
+
+## Architecture
+ ![architecture](/../connectingFE/personalAssistantImg/architecture.jpg)
+
+
 ## Screenshot
  ![Main1](/../connectingFE/personalAssistantImg/main-beforeLogin.png)
  ![Main2](/../connectingFE/personalAssistantImg/main-afterLogin.png)
@@ -26,6 +30,11 @@ Project is created with:
 ## Setup
 ```
 $ cd ../PersonalAssistant
+
+(Using Docker setup - including local Dynamo DB)
+$ docker compose-up
+
+(Running flask app only)
 $ python app.py
 ```
 

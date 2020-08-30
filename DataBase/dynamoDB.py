@@ -62,12 +62,3 @@ class Database:
         )
 
         print("Table status:", table.table_status)
-
-if __name__ == '__main__':
-    db = Database()
-    item = {"id": "8888", "email": "hi@gmail.com", "name": "mina", "email_verified":False}
-    db.add_item("user-info", item)
-    res2 = db.read_item("user-info", "8888")
-    print(res2)
-    res3 = db.read_all_item("user-info")
-    print(res3)

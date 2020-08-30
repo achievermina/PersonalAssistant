@@ -19,7 +19,7 @@ class User(UserMixin):
 
     @staticmethod
     def get(user_id):
-        logging.info("getting user from the database %s", user_id )
+        logging.info("getting user from the database %s", user_id)
         try:
             db = Database()
             user =  db.read_item("user-info", user_id)

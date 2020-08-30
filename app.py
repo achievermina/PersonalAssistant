@@ -2,7 +2,7 @@ import sys, os
 from API.User import User, read_token
 import API.googleSignIn  as gs
 import API.googleCalendar  as gc
-from flask import Flask, jsonify, make_response
+from flask import jsonify, make_response
 from flask_cors import CORS, cross_origin
 import logging, json
 from flask import Flask, request
@@ -100,7 +100,6 @@ def search():
         return response
 
     except Exception as e:
-        print(e)
         return e
 
 @app.errorhandler(404)
@@ -110,12 +109,3 @@ def not_found():
 @app.route('/')
 def main():
     return '''<h2>hi Personal Assistant - Backend</h2>'''
-
-if __name__ == "__main__":
-    logging.getLogger('flask_cors').level = logging.DEBUG
-    root = logging.getLogger()
-    root.setLevel(logging.INFO)
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(logging.INFO)
-
-    app.run(host='0.0.0.0', debug=True)
